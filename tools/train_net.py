@@ -38,10 +38,12 @@ from detectron2.evaluation import (
     verify_results,
 )
 from detectron2.modeling import GeneralizedRCNNWithTTA
+from detectron2.data.datasets import register_coco_instances
 
-#os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
+
 
 class Trainer(DefaultTrainer):
     """
@@ -116,6 +118,15 @@ class Trainer(DefaultTrainer):
         res = OrderedDict({k + "_TTA": v for k, v in res.items()})
         return res
 
+def register_custom_datasets():
+    register_coco_instances(
+        "training_class_2_train", {},
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/annotations/instances_train.json",
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/images/train")
+    register_coco_instances(
+        "training_class_2_val", {},
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/annotations/instances_val.json",
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/images/val")
 
 def setup(args):
     """
@@ -131,6 +142,7 @@ def setup(args):
 
 def main(args):
     cfg = setup(args)
+    register_custom_datasets()
 
     if args.eval_only:
         model = Trainer.build_model(cfg)
@@ -138,11 +150,11 @@ def main(args):
             cfg.MODEL.WEIGHTS, resume=args.resume
         )
         if cfg.MODEL.META_ARCHITECTURE in ['CLIPRCNN', 'CLIPFastRCNN', 'PretrainFastRCNN'] \
-            and cfg.MODEL.CLIP.BB_RPN_WEIGHTS is not None\
-            and cfg.MODEL.CLIP.CROP_REGION_TYPE == 'RPN': # load 2nd pretrained model
-            DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR, bb_rpn_weights=True).resume_or_load(
-                cfg.MODEL.CLIP.BB_RPN_WEIGHTS, resume=False
-            )
+                and cfg.MODEL.CLIP.BB_RPN_WEIGHTS is not None\
+                and cfg.MODEL.CLIP.CROP_REGION_TYPE == 'RPN':  # load 2nd pretrained model
+            DetectionCheckpointer(
+                model, save_dir=cfg.OUTPUT_DIR, bb_rpn_weights=True).resume_or_load(
+                cfg.MODEL.CLIP.BB_RPN_WEIGHTS, resume=False)
         res = Trainer.test(cfg, model)
         if cfg.TEST.AUG.ENABLED:
             res.update(Trainer.test_with_TTA(cfg, model))
