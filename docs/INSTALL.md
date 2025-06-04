@@ -12,16 +12,17 @@ The installation follows [Detectron2](https://github.com/facebookresearch/detect
 
 ```
 # environment
-conda create -n regionclip python=3.9
+conda create -n regionclip python=3.13
 source activate regionclip
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+conda install nvidia/label/cuda-12.8.1::cuda-toolkit
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 
 # RegionCLIP
 git clone git@github.com:microsoft/RegionCLIP.git
 python -m pip install -e RegionCLIP
 
 # other dependencies
-pip install opencv-python timm diffdist h5py sklearn ftfy
+pip install opencv-python timm diffdist h5py scikit-learn ftfy
 pip install git+https://github.com/lvis-dataset/lvis-api.git
 ```
 
