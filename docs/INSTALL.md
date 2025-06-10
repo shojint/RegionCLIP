@@ -22,7 +22,7 @@ git clone git@github.com:microsoft/RegionCLIP.git
 python -m pip install -e RegionCLIP
 
 # other dependencies
-pip install opencv-python timm diffdist h5py scikit-learn ftfy
+pip install opencv-python timm diffdist h5py scikit-learn ftfy numpy==1.26.4 setuptools==59.5.0
 pip install git+https://github.com/lvis-dataset/lvis-api.git
 ```
 
