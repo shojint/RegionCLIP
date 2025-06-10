@@ -15,6 +15,7 @@ from detectron2.utils.file_io import PathManager
 from detectron2.utils.logger import setup_logger
 from detectron2.utils.visualizer import Visualizer
 
+from detectron2.data.datasets import register_coco_instances
 
 def create_instances(predictions, image_size):
     ret = Instances(image_size)
@@ -37,6 +38,15 @@ def create_instances(predictions, image_size):
         pass
     return ret
 
+def register_custom_datasets():
+    register_coco_instances(
+        "training_class_2_train", {},
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/annotations/instances_train.json",
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/images/train")
+    register_coco_instances(
+        "training_class_2_val", {},
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/annotations/instances_val.json",
+        "/home/vgpu/Downloads/EPD_images_dataset/training_class_2/images/val")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -52,6 +62,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger = setup_logger()
+    register_custom_datasets()
 
     with PathManager.open(args.input, "r") as f:
         predictions = json.load(f)
